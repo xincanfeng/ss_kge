@@ -281,7 +281,9 @@ class KGEModel(nn.Module):
             positive_sample_loss = - positive_score.mean()
             negative_sample_loss = - negative_score.mean()
         else:
+            #applying term A
             positive_sample_loss = - (subsampling_weight * positive_score).sum()/subsampling_weight.sum()
+            #applying term B
             negative_sample_loss = - (subsampling_weight * negative_score).sum()/subsampling_weight.sum()
 
         loss = (positive_sample_loss + negative_sample_loss)/2
@@ -310,6 +312,76 @@ class KGEModel(nn.Module):
 
         return log
     
+    @staticmethod
+    def train_step_ss(model, optimizer, train_iterator, args):
+        '''
+        A single train step. Apply back-propation and return the loss
+        Note: This method applies self-adversarial subsampling
+        '''
+
+        model.train()
+
+        optimizer.zero_grad()
+
+        positive_sample, negative_sample, subsampling_weight, mode = next(train_iterator)
+        positive_sample, negative_sample, mbs_triple_freq, mbs_hr_freq, mbs_tr_freq, mode = next(train_iterator)
+
+        if args.cuda:
+            positive_sample = positive_sample.cuda()
+            negative_sample = negative_sample.cuda()
+            mbs_triple_freq = mbs_triple_freq.cuda()
+            mbs_hr_freq = mbs_hr_freq.cuda()
+            mbs_tr_freq = mbs_tr_freq.cuda()
+
+        with torch.cuda.amp.autocast():
+            negative_score = model((positive_sample, negative_sample), mode=mode)
+
+            if args.negative_adversarial_sampling:
+                #In self-adversarial sampling, we do not apply back-propagation on the sampling weight
+                negative_score = (F.softmax(negative_score * args.adversarial_temperature, dim = 1).detach() 
+                                * F.logsigmoid(-negative_score)).sum(dim = 1)
+            else:
+                negative_score = F.logsigmoid(-negative_score).mean(dim = 1)
+
+            positive_score = model(positive_sample)
+
+            positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
+
+            if args.uni_weight:
+                positive_sample_loss = - positive_score.mean()
+                negative_sample_loss = - negative_score.mean()
+            else:
+                #applying term A
+                positive_sample_loss = - (subsampling_weight * positive_score).sum()/subsampling_weight.sum()
+                #applying term B
+                negative_sample_loss = - (subsampling_weight * negative_score).sum()/subsampling_weight.sum()
+
+            loss = (positive_sample_loss + negative_sample_loss)/2
+            
+            if args.regularization != 0.0:
+                #Use L3 regularization for ComplEx and DistMult
+                regularization = args.regularization * (
+                    model.entity_embedding.norm(p = 3)**3 + 
+                    model.relation_embedding.norm(p = 3).norm(p = 3)**3
+                )
+                loss = loss + regularization
+                regularization_log = {'regularization': regularization.item()}
+            else:
+                regularization_log = {}
+            
+        loss.backward()
+
+        optimizer.step()
+
+        log = {
+            **regularization_log,
+            'positive_sample_loss': positive_sample_loss.item(),
+            'negative_sample_loss': negative_sample_loss.item(),
+            'loss': loss.item()
+        }
+
+        return log
+
     @staticmethod
     def test_step(model, test_triples, all_true_triples, args):
         '''
