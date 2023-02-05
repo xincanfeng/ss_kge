@@ -281,9 +281,9 @@ class KGEModel(nn.Module):
             positive_sample_loss = - positive_score.mean()
             negative_sample_loss = - negative_score.mean()
         else:
-            #applying term A
+            #applying term A?
             positive_sample_loss = - (subsampling_weight * positive_score).sum()/subsampling_weight.sum()
-            #applying term B
+            #applying term B?
             negative_sample_loss = - (subsampling_weight * negative_score).sum()/subsampling_weight.sum()
 
         loss = (positive_sample_loss + negative_sample_loss)/2
@@ -323,8 +323,7 @@ class KGEModel(nn.Module):
 
         optimizer.zero_grad()
 
-        positive_sample, negative_sample, subsampling_weight, mode = next(train_iterator)
-        positive_sample, negative_sample, mbs_triple_freq, mbs_hr_freq, mbs_tr_freq, mode = next(train_iterator)
+        positive_sample, negative_sample, mbs_triple_freq, mbs_hr_freq, mbs_tr_freq, cnt_hr_freq, cnt_tr_freq, mode = next(train_iterator)
 
         if args.cuda:
             positive_sample = positive_sample.cuda()
@@ -332,8 +331,11 @@ class KGEModel(nn.Module):
             mbs_triple_freq = mbs_triple_freq.cuda()
             mbs_hr_freq = mbs_hr_freq.cuda()
             mbs_tr_freq = mbs_tr_freq.cuda()
+            cnt_hr_freq = cnt_hr_freq.cuda()
+            cnt_tr_freq = cnt_tr_freq.cuda()
 
         with torch.cuda.amp.autocast():
+
             negative_score = model((positive_sample, negative_sample), mode=mode)
 
             if args.negative_adversarial_sampling:
@@ -344,17 +346,48 @@ class KGEModel(nn.Module):
                 negative_score = F.logsigmoid(-negative_score).mean(dim = 1)
 
             positive_score = model(positive_sample)
-
             positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
 
-            if args.uni_weight:
-                positive_sample_loss = - positive_score.mean()
-                negative_sample_loss = - negative_score.mean()
+            # Cannot allow to combine different subsampling methods
+            assert((args.ss_freq^args.ss_uniq)^args.ss_default)
+
+            if mode == 'head-batch':
+                cnt_query_freq = cnt_tr_freq
+                mbs_query_freq = mbs_tr_freq
+            if mode == 'tail-batch':
+                cnt_query_freq = cnt_hr_freq
+                mbs_query_freq = mbs_hr_freq
+            cnt_triple_freq = cnt_hr_freq + cnt_tr_freq
+
+            mbs_triple_weight = model._norm_inv(mbs_triple_freq, args.subsampling_model_temperature)
+            mbs_query_weight = model._norm_inv(mbs_query_freq, args.subsampling_model_temperature)
+
+            if args.mbs_ratio < 1.0:
+                cnt_query_weight = model._norm_inv(cnt_query_freq, 0.5)
+                cnt_triple_weight = model._norm_inv(cnt_triple_freq, 0.5)
+                mixed_triple_weight = model._norm_wsum(mbs_triple_weight, cnt_triple_weight, args.mbs_ratio).squeeze(-1)
+                mixed_query_weight = model._norm_wsum(mbs_query_weight, cnt_query_weight, args.mbs_ratio).squeeze(-1)
             else:
-                #applying term A
-                positive_sample_loss = - (subsampling_weight * positive_score).sum()/subsampling_weight.sum()
-                #applying term B
-                negative_sample_loss = - (subsampling_weight * negative_score).sum()/subsampling_weight.sum()
+                mixed_triple_weight = mbs_triple_weight.squeeze(-1)
+                mixed_query_weight = mbs_query_weight.squeeze(-1)
+
+            if args.ss_freq:
+                
+                positive_sample_loss = - (mixed_triple_weight * positive_score).sum()
+                negative_sample_loss = - (mixed_query_weight * negative_score).sum()
+            
+            elif args.ss_uniq:
+                
+                positive_sample_loss = - (mixed_query_weight * positive_score).sum()
+                negative_sample_loss = - (mixed_query_weight * negative_score).sum()
+            
+            elif args.ss_default:
+           
+                positive_sample_loss = - (mixed_triple_weight * positive_score).sum()
+                negative_sample_loss = - (mixed_triple_weight * negative_score).sum()
+            
+            else:
+                assert(False)
 
             loss = (positive_sample_loss + negative_sample_loss)/2
             
