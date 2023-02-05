@@ -310,8 +310,6 @@ def main(args):
             if args.ss_default or args.ss_freq or args.ss_uniq:
                 # Cannot allow to combine different subsampling methods
                 assert((args.ss_freq^args.ss_uniq)^args.ss_default)
-                # Cannot allow to do model-based subsampling without any trained model
-                assert(args.subsampling_model != None)
                 log = kge_model.train_step_ss(kge_model, optimizer, train_iterator, args)
             else:
                 log = kge_model.train_step(kge_model, optimizer, train_iterator, args)
