@@ -348,6 +348,8 @@ class KGEModel(nn.Module):
             positive_score = model(positive_sample)
             positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
 
+            batch_size = positive_score.shape[0]
+
             # Cannot allow to combine different subsampling methods
             assert((args.ss_freq^args.ss_uniq)^args.ss_default)
 
@@ -387,7 +389,9 @@ class KGEModel(nn.Module):
                 negative_sample_loss = - (mixed_triple_weight * negative_score).sum()
             
             else:
-                assert(False)
+
+                positive_sample_loss = - (positive_score).sum() / batch_size
+                negative_sample_loss = - (negative_score).sum() / batch_size
 
             loss = (positive_sample_loss + negative_sample_loss)/2
             

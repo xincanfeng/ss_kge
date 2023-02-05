@@ -67,6 +67,11 @@ def parse_args(args=None):
     
     parser.add_argument('--nentity', type=int, default=0, help='DO NOT MANUALLY SET')
     parser.add_argument('--nrelation', type=int, default=0, help='DO NOT MANUALLY SET')
+
+    parser.add_argument('--ss_ratio', default=1.0, type=float, help='Mixing weight for model-based subsampling')
+    parser.add_argument('--ss_default', action='store_true', help='Self-adversarial subsampling based on the subsampling in Sun et al., (2019)')
+    parser.add_argument('--ss_freq', action='store_true', help='Self-adversarial subsampling based on the frequency-based subsampling in Kamigaito et al., (2022)')
+    parser.add_argument('--ss_uniq', action='store_true', help='Self-adversarial subsampling based on the unique-based subsampling in Kamigaito et al., (2022)')
     
     return parser.parse_args(args)
 
