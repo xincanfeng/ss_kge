@@ -303,6 +303,8 @@ def main(args):
         logging.info('learning_rate = %d' % current_learning_rate)
 
         training_logs = []
+
+        scaler = torch.cuda.amp.GradScaler()
         
         #Training Loop
         for step in range(init_step, args.max_steps):
@@ -310,9 +312,9 @@ def main(args):
             if args.ss_default or args.ss_freq or args.ss_uniq:
                 # Cannot allow to combine different subsampling methods
                 assert((args.ss_freq^args.ss_uniq)^args.ss_default)
-                log = kge_model.train_step_ss(kge_model, optimizer, train_iterator, args)
+                log = kge_model.train_step_ss(kge_model, optimizer, scaler, train_iterator, args)
             else:
-                log = kge_model.train_step(kge_model, optimizer, train_iterator, args)
+                log = kge_model.train_step(kge_model, optimizer, scaler, train_iterator, args)
             
             training_logs.append(log)
             

@@ -248,7 +248,7 @@ class KGEModel(nn.Module):
         return score
     
     @staticmethod
-    def train_step(model, optimizer, train_iterator, args):
+    def train_step(model, optimizer, scaler, train_iterator, args):
         '''
         A single train step. Apply back-propation and return the loss
         '''
@@ -298,10 +298,12 @@ class KGEModel(nn.Module):
             regularization_log = {'regularization': regularization.item()}
         else:
             regularization_log = {}
-            
-        loss.backward()
+        
+        scaler.scale(loss).backward()
 
-        optimizer.step()
+        scaler.step(optimizer)
+
+        scaler.update()
 
         log = {
             **regularization_log,
@@ -313,7 +315,7 @@ class KGEModel(nn.Module):
         return log
     
     @staticmethod
-    def train_step_ss(model, optimizer, train_iterator, args):
+    def train_step_ss(model, optimizer, scaler, train_iterator, args):
         '''
         A single train step. Apply back-propation and return the loss
         Note: This method applies self-adversarial subsampling
@@ -405,10 +407,12 @@ class KGEModel(nn.Module):
                 regularization_log = {'regularization': regularization.item()}
             else:
                 regularization_log = {}
-            
-        loss.backward()
 
-        optimizer.step()
+        scaler.scale(loss).backward()
+
+        scaler.step(optimizer)
+
+        scaler.update()
 
         log = {
             **regularization_log,
