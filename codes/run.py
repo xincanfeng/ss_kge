@@ -68,10 +68,7 @@ def parse_args(args=None):
     parser.add_argument('--nentity', type=int, default=0, help='DO NOT MANUALLY SET')
     parser.add_argument('--nrelation', type=int, default=0, help='DO NOT MANUALLY SET')
 
-    parser.add_argument('--ss_ratio', default=1.0, type=float, help='Mixing weight for model-based subsampling')
-    parser.add_argument('--ss_default', action='store_true', help='Self-adversarial subsampling based on the subsampling in Sun et al., (2019)')
-    parser.add_argument('--ss_freq', action='store_true', help='Self-adversarial subsampling based on the frequency-based subsampling in Kamigaito et al., (2022)')
-    parser.add_argument('--ss_uniq', action='store_true', help='Self-adversarial subsampling based on the unique-based subsampling in Kamigaito et al., (2022)')
+    parser.add_argument('--ss', action='store_true', help='Self-adversarial subsampling')
     
     return parser.parse_args(args)
 
@@ -309,9 +306,7 @@ def main(args):
         #Training Loop
         for step in range(init_step, args.max_steps):
             
-            if args.ss_default or args.ss_freq or args.ss_uniq:
-                # Cannot allow to combine different subsampling methods
-                assert((args.ss_freq^args.ss_uniq)^args.ss_default)
+            if args.ss:
                 log = kge_model.train_step_ss(kge_model, optimizer, scaler, train_iterator, args)
             else:
                 log = kge_model.train_step(kge_model, optimizer, scaler, train_iterator, args)

@@ -325,75 +325,29 @@ class KGEModel(nn.Module):
 
         optimizer.zero_grad()
 
-        positive_sample, negative_sample, mbs_triple_freq, mbs_hr_freq, mbs_tr_freq, cnt_hr_freq, cnt_tr_freq, mode = next(train_iterator)
+        positive_sample, negative_sample, mode = next(train_iterator)
 
         if args.cuda:
             positive_sample = positive_sample.cuda()
             negative_sample = negative_sample.cuda()
-            mbs_triple_freq = mbs_triple_freq.cuda()
-            mbs_hr_freq = mbs_hr_freq.cuda()
-            mbs_tr_freq = mbs_tr_freq.cuda()
-            cnt_hr_freq = cnt_hr_freq.cuda()
-            cnt_tr_freq = cnt_tr_freq.cuda()
 
         with torch.cuda.amp.autocast():
 
             negative_score = model((positive_sample, negative_sample), mode=mode)
+            positive_score = model(positive_sample)
 
             if args.negative_adversarial_sampling:
                 #In self-adversarial sampling, we do not apply back-propagation on the sampling weight
                 negative_score = (F.softmax(negative_score * args.adversarial_temperature, dim = 1).detach() 
                                 * F.logsigmoid(-negative_score)).sum(dim = 1)
+                positive_score = (F.softmax(positive_score * args.adversarial_temperature, dim = 1).detach() 
+                                * F.logsigmoid(-positive_score)).sum(dim = 1)
             else:
                 negative_score = F.logsigmoid(-negative_score).mean(dim = 1)
+                positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
 
-            positive_score = model(positive_sample)
-            positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
-
-            batch_size = positive_score.shape[0]
-
-            # Cannot allow to combine different subsampling methods
-            assert((args.ss_freq^args.ss_uniq)^args.ss_default)
-
-            if mode == 'head-batch':
-                cnt_query_freq = cnt_tr_freq
-                mbs_query_freq = mbs_tr_freq
-            if mode == 'tail-batch':
-                cnt_query_freq = cnt_hr_freq
-                mbs_query_freq = mbs_hr_freq
-            cnt_triple_freq = cnt_hr_freq + cnt_tr_freq
-
-            mbs_triple_weight = model._norm_inv(mbs_triple_freq, args.subsampling_model_temperature)
-            mbs_query_weight = model._norm_inv(mbs_query_freq, args.subsampling_model_temperature)
-
-            if args.mbs_ratio < 1.0:
-                cnt_query_weight = model._norm_inv(cnt_query_freq, 0.5)
-                cnt_triple_weight = model._norm_inv(cnt_triple_freq, 0.5)
-                mixed_triple_weight = model._norm_wsum(mbs_triple_weight, cnt_triple_weight, args.mbs_ratio).squeeze(-1)
-                mixed_query_weight = model._norm_wsum(mbs_query_weight, cnt_query_weight, args.mbs_ratio).squeeze(-1)
-            else:
-                mixed_triple_weight = mbs_triple_weight.squeeze(-1)
-                mixed_query_weight = mbs_query_weight.squeeze(-1)
-
-            if args.ss_freq:
-                
-                positive_sample_loss = - (mixed_triple_weight * positive_score).sum()
-                negative_sample_loss = - (mixed_query_weight * negative_score).sum()
-            
-            elif args.ss_uniq:
-                
-                positive_sample_loss = - (mixed_query_weight * positive_score).sum()
-                negative_sample_loss = - (mixed_query_weight * negative_score).sum()
-            
-            elif args.ss_default:
-           
-                positive_sample_loss = - (mixed_triple_weight * positive_score).sum()
-                negative_sample_loss = - (mixed_triple_weight * negative_score).sum()
-            
-            else:
-
-                positive_sample_loss = - (positive_score).sum() / batch_size
-                negative_sample_loss = - (negative_score).sum() / batch_size
+            positive_sample_loss = - positive_score.mean()
+            negative_sample_loss = - negative_score.mean()
 
             loss = (positive_sample_loss + negative_sample_loss)/2
             
