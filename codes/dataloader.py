@@ -28,6 +28,9 @@ class TrainDataset(Dataset):
         positive_sample = self.triples[idx]
 
         head, relation, tail = positive_sample
+
+        subsampling_weight = self.count[(head, relation)] + self.count[(tail, -relation-1)]
+        subsampling_weight = torch.sqrt(1 / torch.Tensor([subsampling_weight]))
         
         negative_sample_list = []
         negative_sample_size = 0
@@ -59,15 +62,16 @@ class TrainDataset(Dataset):
         negative_sample = torch.LongTensor(negative_sample)
 
         positive_sample = torch.LongTensor(positive_sample)
-            
-        return positive_sample, negative_sample, self.mode
+        
+        return positive_sample, negative_sample, subsampling_weight, self.mode
     
     @staticmethod
     def collate_fn(data):
         positive_sample = torch.stack([_[0] for _ in data], dim=0)
         negative_sample = torch.stack([_[1] for _ in data], dim=0)
-        mode = data[0][2]
-        return positive_sample, negative_sample, mode
+        subsample_weight = torch.cat([_[2] for _ in data], dim=0)
+        mode = data[0][3]
+        return positive_sample, negative_sample, subsample_weight, mode
     
     @staticmethod
     def count_frequency(triples, start=4):
