@@ -18,6 +18,7 @@ from torch.utils.data import DataLoader
 
 from dataloader import TestDataset
 
+
 class KGEModel(nn.Module):
     def __init__(self, model_name, nentity, nrelation, hidden_dim, gamma, 
                  double_entity_embedding=False, double_relation_embedding=False):
@@ -345,7 +346,7 @@ class KGEModel(nn.Module):
             positive_score = model(positive_sample)
 
             #self-adversarial sampling weight
-            ss_subsampling_weight = F.softmax(torch.exp(positive_score).squeeze(-1) * args.self_adversarial_temperature, dim = 1).detach()
+            ss_subsampling_weight = F.normalize(torch.exp(positive_score).squeeze(-1) * args.self_adversarial_temperature, p = 2, dim = 0).detach()
 
             positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
 
