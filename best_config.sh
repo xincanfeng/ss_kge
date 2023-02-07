@@ -1,5 +1,6 @@
 # GPU_DEVICE=$4 
 # SAVE_ID=$5
+# Tempreture: 2, 1, 0.5, 0.1, 0.05, 0.01
 # Best Configuration for RotatE
 #
 nohup bash run.sh train RotatE FB15k 0 0 1024 256 1000 24.0 1.0 0.0001 150000 16 -de &

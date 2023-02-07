@@ -345,7 +345,7 @@ class KGEModel(nn.Module):
             positive_score = model(positive_sample)
 
             #self-adversarial sampling weight
-            ss_subsampling_weight = F.softmax(torch.exp(positive_score).squeeze(-1) * args.adversarial_temperature, dim = 1).detach()
+            ss_subsampling_weight = F.softmax(torch.exp(positive_score).squeeze(-1) * args.self_adversarial_temperature, dim = 1).detach()
 
             positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
 
