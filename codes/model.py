@@ -281,9 +281,9 @@ class KGEModel(nn.Module):
             positive_sample_loss = - positive_score.mean()
             negative_sample_loss = - negative_score.mean()
         else:
-            #applying term A?
+            #applying term A
             positive_sample_loss = - (subsampling_weight * positive_score).sum()/subsampling_weight.sum()
-            #applying term B?
+            #applying term B
             negative_sample_loss = - (subsampling_weight * negative_score).sum()/subsampling_weight.sum()
 
         loss = (positive_sample_loss + negative_sample_loss)/2
@@ -334,20 +334,26 @@ class KGEModel(nn.Module):
         with torch.cuda.amp.autocast():
 
             negative_score = model((positive_sample, negative_sample), mode=mode)
-            positive_score = model(positive_sample)
 
             if args.negative_adversarial_sampling:
                 #In self-adversarial sampling, we do not apply back-propagation on the sampling weight
                 negative_score = (F.softmax(negative_score * args.adversarial_temperature, dim = 1).detach() 
                                 * F.logsigmoid(-negative_score)).sum(dim = 1)
-                positive_score = (F.softmax(positive_score * args.adversarial_temperature, dim = 1).detach() 
-                                * F.logsigmoid(-positive_score)).sum(dim = 1)
             else:
                 negative_score = F.logsigmoid(-negative_score).mean(dim = 1)
-                positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
 
-            positive_sample_loss = - positive_score.mean()
-            negative_sample_loss = - negative_score.mean()
+            positive_score = model(positive_sample)
+
+            ss_subsampling_weight = positive_score.detach()
+
+            positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
+
+            if args.uni_weight:
+                positive_sample_loss = - positive_score.mean()
+                negative_sample_loss = - negative_score.mean()
+            else:
+                positive_sample_loss = - (ss_subsampling_weight * positive_score).sum()/ss_subsampling_weight.sum()
+                negative_sample_loss = - (ss_subsampling_weight * negative_score).sum()/ss_subsampling_weight.sum()
 
             loss = (positive_sample_loss + negative_sample_loss)/2
             
