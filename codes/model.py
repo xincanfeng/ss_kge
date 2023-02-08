@@ -346,16 +346,18 @@ class KGEModel(nn.Module):
             positive_score = model(positive_sample)
 
             #self-adversarial sampling weight
-            # ss_subsampling_weight = F.normalize(torch.exp(positive_score).squeeze(-1) * args.self_adversarial_temperature, p = 2, dim = 0).detach() #s8
-            # ss_subsampling_weight = F.normalize(torch.exp(positive_score) * args.self_adversarial_temperature, p = 2, dim = 0).detach() #s7
-            # ss_subsampling_weight = F.normalize(positive_score.squeeze(-1) * args.self_adversarial_temperature, p = 2, dim = 0).detach() #s6
-            # ss_subsampling_weight = F.normalize(positive_score * args.self_adversarial_temperature, p = 2, dim = 0).detach() #s5
-
-            # ss_subsampling_weight = F.softmax(positive_score.squeeze(-1) * args.self_adversarial_temperature, dim = 0).detach() #s4
-            # ss_subsampling_weight = F.softmax(positive_score * args.self_adversarial_temperature, dim = 0).detach() #s3
-
-            # ss_subsampling_weight = (positive_score.squeeze(-1) * args.self_adversarial_temperature).detach() #s2
-            ss_subsampling_weight = (positive_score * args.self_adversarial_temperature).detach() #s1
+            if args.s8:
+                ss_subsampling_weight = (torch.exp(positive_score) * args.self_adversarial_temperature).detach()
+            # elif args.s7:
+            # elif args.s6:
+            elif args.s5:
+                ss_subsampling_weight = F.normalize(positive_score * args.self_adversarial_temperature, p = 2, dim = 0).detach()
+            # elif args.s4:
+            elif args.s3:
+                ss_subsampling_weight = F.softmax(positive_score * args.self_adversarial_temperature, dim = 0).detach()
+            # elif args.s2:
+            elif args.s1:
+                ss_subsampling_weight = (positive_score * args.self_adversarial_temperature).detach()
 
             positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
 

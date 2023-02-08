@@ -1,5 +1,6 @@
 # GPU_DEVICE=$4 
 # SAVE_ID=$5
+# Tempreture: 2, 1, 0.5, 0.1, 0.05, 0.01
 # Best Configuration for RotatE
 #
 # nohup bash run.sh train RotatE FB15k 2 0 1024 256 1000 24.0 1.0 0.0001 150000 16 -de &
@@ -50,6 +51,30 @@ nohup bash run.sh train ComplEx countries_S3 0 0 512 64 1000 1.0 1.0 0.000002 40
 nohup bash run.sh train ComplEx FB15k-237 0 s1 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --ss &
 nohup bash run.sh train ComplEx wn18 0 s1 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --ss &
 # nohup bash run.sh train ComplEx wn18rr 0 s1 512 1024 500 200.0 1.0 0.002 80000 8 -de -dr -r 0.000005 --ss &
+
+nohup bash run.sh train ComplEx FB15k-237 0 s1 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s1 &
+nohup bash run.sh train ComplEx wn18 0 s1 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s1 &
+
+# nohup bash run.sh train ComplEx FB15k-237 0 s2 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s2 &
+# nohup bash run.sh train ComplEx wn18 0 s2 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s2 &
+
+nohup bash run.sh train ComplEx FB15k-237 1 s3 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s3 &
+nohup bash run.sh train ComplEx wn18 1 s3 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s3 &
+
+# nohup bash run.sh train ComplEx FB15k-237 1 s4 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s4 &
+# nohup bash run.sh train ComplEx wn18 1 s4 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s4 &
+
+nohup bash run.sh train ComplEx FB15k-237 2 s5 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s5 &
+nohup bash run.sh train ComplEx wn18 2 s5 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s5 &
+
+# nohup bash run.sh train ComplEx FB15k-237 2 s6 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s6 &
+# nohup bash run.sh train ComplEx wn18 2 s6 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s6 &
+
+# nohup bash run.sh train ComplEx FB15k-237 3 s7 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s7 &
+# nohup bash run.sh train ComplEx wn18 3 s7 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s7 &
+
+nohup bash run.sh train ComplEx FB15k-237 3 s8 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s8 &
+nohup bash run.sh train ComplEx wn18 3 s8 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s8 &
 #
 # Best Configuration for DistMult
 # 

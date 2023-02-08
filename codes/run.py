@@ -69,7 +69,15 @@ def parse_args(args=None):
     parser.add_argument('--nentity', type=int, default=0, help='DO NOT MANUALLY SET')
     parser.add_argument('--nrelation', type=int, default=0, help='DO NOT MANUALLY SET')
 
-    parser.add_argument('--ss', action='store_true', help='Self-adversarial subsampling')
+    # parser.add_argument('--ss', action='store_true', help='Self-adversarial subsampling')
+    parser.add_argument('--s1', action='store_true', help='Self-adversarial subsampling')
+    parser.add_argument('--s2', action='store_true', help='Self-adversarial subsampling')
+    parser.add_argument('--s3', action='store_true', help='Self-adversarial subsampling')
+    parser.add_argument('--s4', action='store_true', help='Self-adversarial subsampling')
+    parser.add_argument('--s5', action='store_true', help='Self-adversarial subsampling')
+    parser.add_argument('--s6', action='store_true', help='Self-adversarial subsampling')
+    parser.add_argument('--s7', action='store_true', help='Self-adversarial subsampling')
+    parser.add_argument('--s8', action='store_true', help='Self-adversarial subsampling')
     
     return parser.parse_args(args)
 
@@ -307,7 +315,7 @@ def main(args):
         #Training Loop
         for step in range(init_step, args.max_steps):
             
-            if args.ss:
+            if args.s1 or args.s2 or args.s3 or args.s4 or args.s5 or args.s6 or args.s7 or args.s8:
                 log = kge_model.train_step_ss(kge_model, optimizer, scaler, train_iterator, args)
             else:
                 log = kge_model.train_step(kge_model, optimizer, scaler, train_iterator, args)
