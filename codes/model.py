@@ -346,17 +346,39 @@ class KGEModel(nn.Module):
             positive_score = model(positive_sample)
 
             #self-adversarial sampling weight
-            # ss_subsampling_weight = F.normalize(torch.exp(positive_score).squeeze(-1) * args.self_adversarial_temperature, p = 2, dim = 0).detach()
-            ss_subsampling_weight = F.softmax(torch.exp(positive_score).squeeze(-1) * args.self_adversarial_temperature, dim = 0).detach()
+            # ss_subsampling_weight = F.normalize(torch.exp(positive_score).squeeze(-1) * args.self_adversarial_temperature, p = 2, dim = 0).detach() #s8
+            # ss_subsampling_weight = F.normalize(torch.exp(positive_score) * args.self_adversarial_temperature, p = 2, dim = 0).detach() #s7
+            # ss_subsampling_weight = F.normalize(positive_score.squeeze(-1) * args.self_adversarial_temperature, p = 2, dim = 0).detach() #s6
+            # ss_subsampling_weight = F.normalize(positive_score * args.self_adversarial_temperature, p = 2, dim = 0).detach() #s5
+
+            # ss_subsampling_weight = F.softmax(positive_score.squeeze(-1) * args.self_adversarial_temperature, dim = 0).detach() #s4
+            # ss_subsampling_weight = F.softmax(positive_score * args.self_adversarial_temperature, dim = 0).detach() #s3
+
+            # ss_subsampling_weight = (positive_score.squeeze(-1) * args.self_adversarial_temperature).detach() #s2
+            ss_subsampling_weight = (positive_score * args.self_adversarial_temperature).detach() #s1
 
             positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
 
+            print('ss_subsampling_weight:')
+            print(ss_subsampling_weight)
+            print('score:')
+            print(positive_score)
+            print(negative_score)
+            print('weighted score:')
+            print(ss_subsampling_weight * positive_score)
+            print(ss_subsampling_weight * negative_score)
+            
             if args.uni_weight:
                 positive_sample_loss = - positive_score.mean()
                 negative_sample_loss = - negative_score.mean()
             else:
                 positive_sample_loss = - (ss_subsampling_weight * positive_score).sum()/ss_subsampling_weight.sum()
                 negative_sample_loss = - (ss_subsampling_weight * negative_score).sum()/ss_subsampling_weight.sum()
+
+            print('loss:')
+            print(positive_sample_loss)
+            print(negative_sample_loss)
+            exit()
 
             loss = (positive_sample_loss + negative_sample_loss)/2
             
