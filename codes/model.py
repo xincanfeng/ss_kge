@@ -359,14 +359,14 @@ class KGEModel(nn.Module):
 
             positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
 
-            print('ss_subsampling_weight:')
-            print(ss_subsampling_weight)
-            print('score:')
-            print(positive_score)
-            print(negative_score)
-            print('weighted score:')
-            print(ss_subsampling_weight * positive_score)
-            print(ss_subsampling_weight * negative_score)
+            # print('ss_subsampling_weight:')
+            # print(ss_subsampling_weight)
+            # print('score:')
+            # print(positive_score)
+            # print(negative_score)
+            # print('weighted score:')
+            # print(ss_subsampling_weight * positive_score)
+            # print(ss_subsampling_weight * negative_score)
             
             if args.uni_weight:
                 positive_sample_loss = - positive_score.mean()
@@ -375,10 +375,10 @@ class KGEModel(nn.Module):
                 positive_sample_loss = - (ss_subsampling_weight * positive_score).sum()/ss_subsampling_weight.sum()
                 negative_sample_loss = - (ss_subsampling_weight * negative_score).sum()/ss_subsampling_weight.sum()
 
-            print('loss:')
-            print(positive_sample_loss)
-            print(negative_sample_loss)
-            exit()
+            # print('loss:')
+            # print(positive_sample_loss)
+            # print(negative_sample_loss)
+            # exit()
 
             loss = (positive_sample_loss + negative_sample_loss)/2
             

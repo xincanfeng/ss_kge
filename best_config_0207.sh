@@ -48,8 +48,8 @@ nohup bash run.sh train ComplEx countries_S3 0 0 512 64 1000 1.0 1.0 0.000002 40
 
 # nohup bash run.sh train ComplEx FB15k 0 s1 1024 256 1000 500.0 1.0 0.001 150000 16 -de -dr -r 0.000002 --ss &
 nohup bash run.sh train ComplEx FB15k-237 0 s1 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --ss &
-# nohup bash run.sh train ComplEx wn18 0 s1 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --ss &
-nohup bash run.sh train ComplEx wn18rr 0 s1 512 1024 500 200.0 1.0 0.002 80000 8 -de -dr -r 0.000005 --ss &
+nohup bash run.sh train ComplEx wn18 0 s1 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --ss &
+# nohup bash run.sh train ComplEx wn18rr 0 s1 512 1024 500 200.0 1.0 0.002 80000 8 -de -dr -r 0.000005 --ss &
 #
 # Best Configuration for DistMult
 # 
