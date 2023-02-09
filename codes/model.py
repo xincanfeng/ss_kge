@@ -347,15 +347,7 @@ class KGEModel(nn.Module):
 
             #self-adversarial sampling weight
             if args.s8:
-                ss_subsampling_weight = (torch.exp(positive_score) * args.self_adversarial_temperature).detach()
-            # elif args.s7:
-            # elif args.s6:
-            elif args.s5:
-                ss_subsampling_weight = F.normalize(positive_score * args.self_adversarial_temperature, p = 2, dim = 0).detach()
-            # elif args.s4:
-            elif args.s3:
-                ss_subsampling_weight = F.softmax(positive_score * args.self_adversarial_temperature, dim = 0).detach()
-            # elif args.s2:
+                ss_subsampling_weight = (torch.exp(positive_score * args.self_adversarial_temperature)).detach()
             elif args.s1:
                 ss_subsampling_weight = (positive_score * args.self_adversarial_temperature).detach()
 
