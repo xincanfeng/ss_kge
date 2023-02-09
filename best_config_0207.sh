@@ -16,6 +16,13 @@ nohup bash run.sh train RotatE YAGO3-10 0 0 1024 400 500 24.0 1.0 0.0002 100000 
 # nohup bash run.sh train RotatE FB15k-237 2 s1 1024 256 1000 9.0 1.0 0.00005 100000 16 -de --ss &
 # nohup bash run.sh train RotatE wn18 2 s1 512 1024 500 12.0 0.5 0.0001 80000 8 -de --ss &
 # nohup bash run.sh train RotatE wn18rr 2 s1 512 1024 500 6.0 0.5 0.00005 80000 8 -de --ss &
+
+nohup bash run.sh train RotatE wn18 0 s8_2 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s8 -sa 2 &
+nohup bash run.sh train RotatE wn18 0 s8_1 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s8 -sa 1 &
+nohup bash run.sh train RotatE wn18 0 s8_0.5 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s8 -sa 0.5 &
+nohup bash run.sh train RotatE wn18 0 s8_0.1 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s8 -sa 0.1 &
+nohup bash run.sh train RotatE wn18 1 s8_0.05 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s8 -sa 0.05 &
+nohup bash run.sh train RotatE wn18 1 s8_0.01 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s8 -sa 0.01 &
 #
 # Best Configuration for pRotatE
 #
@@ -103,6 +110,14 @@ nohup bash run.sh train ComplEx FB15k-237 3 s8_0.5 1024 256 1000 200.0 1.0 0.001
 nohup bash run.sh train ComplEx FB15k-237 3 s8_0.1 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s8 -sa 0.1 &
 nohup bash run.sh train ComplEx FB15k-237 1 s8_0.05 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s8 -sa 0.05 &
 nohup bash run.sh train ComplEx FB15k-237 1 s8_0.01 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s8 -sa 0.01 &
+
+nohup bash run.sh train ComplEx wn18 1 s8_2 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s8 -sa 2 &
+nohup bash run.sh train ComplEx wn18 1 s8_1 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s8 -sa 1 &
+nohup bash run.sh train ComplEx wn18 2 s8_0.5 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s8 -sa 0.5 &
+nohup bash run.sh train ComplEx wn18 2 s8_0.1 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s8 -sa 0.1 &
+nohup bash run.sh train ComplEx wn18 2 s8_0.05 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s8 -sa 0.05 &
+nohup bash run.sh train ComplEx wn18 2 s8_0.01 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s8 -sa 0.01 &
+
 #
 # Best Configuration for DistMult
 # 
