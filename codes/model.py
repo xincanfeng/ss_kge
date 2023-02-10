@@ -335,6 +335,7 @@ class KGEModel(nn.Module):
         with torch.cuda.amp.autocast():
 
             negative_score = model((positive_sample, negative_sample), mode=mode)
+            temp = negative_score.unsqueeze(1)[:,:,0]
 
             if args.negative_adversarial_sampling:
                 #In self-adversarial sampling, we do not apply back-propagation on the sampling weight
@@ -344,17 +345,24 @@ class KGEModel(nn.Module):
                 negative_score = F.logsigmoid(-negative_score).mean(dim = 1)
 
             positive_score = model(positive_sample)
+            print(positive_score.shape)
 
             #self-adversarial sampling weight
             if args.s8:
                 ss_subsampling_weight = (torch.exp(positive_score * args.self_adversarial_temperature)).detach()
+            elif args.s7:
+                ss_subsampling_weight = (torch.exp(-positive_score * args.self_adversarial_temperature)).detach()
+            elif args.s6:
+                ss_subsampling_weight = (torch.exp(temp * args.self_adversarial_temperature)).detach()
+            elif args.s5:
+                ss_subsampling_weight = (torch.exp(-temp * args.self_adversarial_temperature)).detach()
             elif args.s1:
                 ss_subsampling_weight = (positive_score * args.self_adversarial_temperature).detach()
 
             positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
 
             # print('ss_subsampling_weight:')
-            # print(ss_subsampling_weight)
+            # print(ss_subsampling_weight.shape)
             # print('score:')
             # print(positive_score)
             # print(negative_score)
