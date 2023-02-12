@@ -17,7 +17,7 @@ nohup bash run.sh train RotatE YAGO3-10 0 0 1024 400 500 24.0 1.0 0.0002 100000 
 # nohup bash run.sh train RotatE wn18 2 s1 512 1024 500 12.0 0.5 0.0001 80000 8 -de --ss &
 # nohup bash run.sh train RotatE wn18rr 2 s1 512 1024 500 6.0 0.5 0.00005 80000 8 -de --ss &
 
-nohup bash run.sh train RotatE FB15k-237 2 s8_0 1024 256 1000 9.0 1.0 0.00005 100000 16 -de --s8 -sa 0.0&
+nohup bash run.sh train RotatE FB15k-237 2 s8_0 1024 256 1000 9.0 1.0 0.00005 100000 16 -de --s8 -sa 0.0 &
 
 nohup bash run.sh train RotatE wn18 0 s8_2 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s8 -sa 2 &
 nohup bash run.sh train RotatE wn18 0 s8_1 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s8 -sa 1 &

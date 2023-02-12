@@ -336,16 +336,17 @@ class KGEModel(nn.Module):
 
             negative_score = model((positive_sample, negative_sample), mode=mode)
             temp = negative_score.unsqueeze(1)[:,:,0]
+            temp2 = negative_score.sum(dim = 1).unsqueeze(1)
 
             if args.negative_adversarial_sampling:
                 #In self-adversarial sampling, we do not apply back-propagation on the sampling weight
                 negative_score = (F.softmax(negative_score * args.adversarial_temperature, dim = 1).detach() 
-                                * F.logsigmoid(-negative_score)).sum(dim = 1)
+                                 * F.logsigmoid(-negative_score)).sum(dim = 1)
             else:
                 negative_score = F.logsigmoid(-negative_score).mean(dim = 1)
 
             positive_score = model(positive_sample)
-            print(positive_score.shape)
+            # print(positive_score.shape)
 
             #self-adversarial sampling weight
             if args.s8:
@@ -356,18 +357,24 @@ class KGEModel(nn.Module):
                 ss_subsampling_weight = (torch.exp(temp * args.self_adversarial_temperature)).detach()
             elif args.s5:
                 ss_subsampling_weight = (torch.exp(-temp * args.self_adversarial_temperature)).detach()
+            elif args.s4:
+                ss_subsampling_weight = (temp2 * positive_score * args.self_adversarial_temperature).detach()
+            elif args.s3:
+                ss_subsampling_weight = (torch.exp(temp2 * positive_score * args.self_adversarial_temperature)).detach()
+            elif args.s2:
+                ss_subsampling_weight = (torch.exp(-temp2 * args.self_adversarial_temperature)).detach()
             elif args.s1:
                 ss_subsampling_weight = (positive_score * args.self_adversarial_temperature).detach()
 
             positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
 
             # print('ss_subsampling_weight:')
-            # print(ss_subsampling_weight.shape)
+            print(ss_subsampling_weight.shape)
             # print('score:')
             # print(positive_score)
             # print(negative_score)
             # print('weighted score:')
-            # print(ss_subsampling_weight * positive_score)
+            # print((ss_subsampling_weight * positive_score).shape)
             # print(ss_subsampling_weight * negative_score)
             
             if args.uni_weight:
@@ -377,10 +384,10 @@ class KGEModel(nn.Module):
                 positive_sample_loss = - (ss_subsampling_weight * positive_score).sum()/ss_subsampling_weight.sum()
                 negative_sample_loss = - (ss_subsampling_weight * negative_score).sum()/ss_subsampling_weight.sum()
 
-            # print('loss:')
-            # print(positive_sample_loss)
-            # print(negative_sample_loss)
-            # exit()
+            print('loss:')
+            print(positive_sample_loss)
+            print(negative_sample_loss)
+            exit()
 
             loss = (positive_sample_loss + negative_sample_loss)/2
             
