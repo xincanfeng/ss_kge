@@ -315,7 +315,6 @@ class KGEModel(nn.Module):
 
         return log
 
-    @staticmethod
     def count_model_freq(model, positive_sample, args):
         '''
         Count model-based frequencies
@@ -374,7 +373,7 @@ class KGEModel(nn.Module):
             positive_score = model(positive_sample)
             # print(positive_score.shape)
 
-            mbs_count = count_model_freq(model, positive_sample, args)
+            mbs_count = self.count_model_freq(model, positive_sample, args)
             print(mbs_count)
             # print(count[(head, relation)])
 
