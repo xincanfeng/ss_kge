@@ -357,11 +357,12 @@ class KGEModel(nn.Module):
 
         mbs_hr_freq = []
         mbs_counts = KGEModel.count_model_freq(model, positive_sample, args)
+        batch_size = positive_sample.shape[0]
         for i in positive_sample:
             head, relation, tail = i.numpy().tolist()
             value = mbs_counts.get((head, relation), 0)
             mbs_hr_freq.append(value)
-        mbs_hr_freq = np.array(mbs_hr_freq).reshape((1024,1))
+        mbs_hr_freq = np.array(mbs_hr_freq).reshape((batch_size,1))
         mbs_hr_freq = torch.tensor(mbs_hr_freq)
 
         if args.cuda:
@@ -395,6 +396,8 @@ class KGEModel(nn.Module):
                 ss_subsampling_weight = (torch.exp(-temp * args.self_adversarial_temperature)).detach()
             elif args.s4:
                 ss_subsampling_weight = (torch.exp(mbs_hr_freq * positive_score * args.self_adversarial_temperature)).detach()
+            elif args.s3:
+                ss_subsampling_weight = (mbs_hr_freq * positive_score * args.self_adversarial_temperature).detach()
             elif args.s1:
                 ss_subsampling_weight = (positive_score * args.self_adversarial_temperature).detach()
 
