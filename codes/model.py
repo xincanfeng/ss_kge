@@ -247,6 +247,33 @@ class KGEModel(nn.Module):
 
         score = self.gamma.item() - score.sum(dim = 2) * self.modulus
         return score
+
+    @staticmethod
+    def count_model_freq(model, positive_sample, args):
+        '''
+        Count model-based frequencies
+        '''
+
+        with torch.no_grad(): 
+            count = {}
+            if args.cuda:
+                positive_sample = positive_sample.cuda()
+
+            scores = torch.exp(model(positive_sample)).squeeze(-1)
+
+            for (head, relation, tail), score in zip(positive_sample, scores): 
+                head, relation, tail, score = [e.item() for e in [head, relation, tail, score]]
+                count[(head, relation, tail)] = score 
+                if (head, relation) in count:
+                    count[(head, relation)] += score 
+                else:
+                    count[(head, relation)] = score 
+                if (tail, -relation-1) in count:
+                    count[(tail, -relation-1)] += score 
+                else: 
+                    count[(tail, -relation-1)] = score
+
+        return count
     
     @staticmethod
     def train_step(model, optimizer, scaler, train_iterator, args):
@@ -315,32 +342,6 @@ class KGEModel(nn.Module):
 
         return log
 
-    def count_model_freq(model, positive_sample, args):
-        '''
-        Count model-based frequencies
-        '''
-
-        with torch.no_grad(): 
-            count = {}
-            if args.cuda:
-                positive_sample = positive_sample.cuda()
-
-            scores = torch.exp(model(positive_sample)).squeeze(-1)
-
-            for (head, relation, tail), score in zip(positive_sample, scores): 
-                head, relation, tail, score = [e.item() for e in [head, relation, tail, score]]
-                count[(head, relation, tail)] = score 
-                if (head, relation) in count:
-                    count[(head, relation)] += score 
-                else:
-                    count[(head, relation)] = score 
-                if (tail, -relation-1) in count:
-                    count[(tail, -relation-1)] += score 
-                else: 
-                    count[(tail, -relation-1)] = score
-
-        return count
-
     @staticmethod
     def train_step_ss(model, optimizer, scaler, train_iterator, args):
         '''
@@ -354,12 +355,19 @@ class KGEModel(nn.Module):
 
         positive_sample, negative_sample, subsampling_weight, mode = next(train_iterator)
 
+        mbs_hr_freq = {}
+        mbs_counts = KGEModel.count_model_freq(model, positive_sample, args)
+        print(mbs_counts)
+        for i in positive_sample:
+            head, relation, tail = i
+            mbs_hr_freq[(head, relation)] = mbs_counts.get((head, relation))
+            # print(mbs_hr_freq)
+
         if args.cuda:
             positive_sample = positive_sample.cuda()
             negative_sample = negative_sample.cuda()
 
         with torch.cuda.amp.autocast():
-
             negative_score = model((positive_sample, negative_sample), mode=mode)
             temp = negative_score.unsqueeze(1)[:,:,0]
             
@@ -372,10 +380,6 @@ class KGEModel(nn.Module):
 
             positive_score = model(positive_sample)
             # print(positive_score.shape)
-
-            mbs_count = self.count_model_freq(model, positive_sample, args)
-            print(mbs_count)
-            # print(count[(head, relation)])
 
             #self-adversarial sampling weight
             if args.s8:
