@@ -315,21 +315,32 @@ class KGEModel(nn.Module):
 
         return log
 
-    # def count_model_freq():
-    #     '''
-    #     Count model-based frequencies 
-    #     '''
+    @staticmethod
+    def count_model_freq(model, positive_sample, args):
+        '''
+        Count model-based frequencies
+        '''
 
-    #     batch_size=args.batch_size
+        with torch.no_grad(): 
+            count = {}
+            if args.cuda:
+                positive_sample = positive_sample.cuda()
 
-    #     with torch.no_grad():
-    #         count = {}
-    #         for positive_sample, mode in ms_dataset:
-    #             if args.cuda:
-    #                 positive_sample = positive_sample.cuda()
+            scores = torch.exp(model(positive_sample)).squeeze(-1)
 
-    #             scores = torch.exp(model(positive_sample))
+            for (head, relation, tail), score in zip(positive_sample, scores): 
+                head, relation, tail, score = [e.item() for e in [head, relation, tail, score]]
+                count[(head, relation, tail)] = score 
+                if (head, relation) in count:
+                    count[(head, relation)] += score 
+                else:
+                    count[(head, relation)] = score 
+                if (tail, -relation-1) in count:
+                    count[(tail, -relation-1)] += score 
+                else: 
+                    count[(tail, -relation-1)] = score
 
+        return count
 
     @staticmethod
     def train_step_ss(model, optimizer, scaler, train_iterator, args):
@@ -352,8 +363,7 @@ class KGEModel(nn.Module):
 
             negative_score = model((positive_sample, negative_sample), mode=mode)
             temp = negative_score.unsqueeze(1)[:,:,0]
-            print(positive_sample)
-
+            
             if args.negative_adversarial_sampling:
                 #In self-adversarial sampling, we do not apply back-propagation on the sampling weight
                 negative_score = (F.softmax(negative_score * args.adversarial_temperature, dim = 1).detach() 
@@ -363,6 +373,10 @@ class KGEModel(nn.Module):
 
             positive_score = model(positive_sample)
             # print(positive_score.shape)
+
+            mbs_count = count_model_freq(model, positive_sample, args)
+            print(mbs_count)
+            # print(count[(head, relation)])
 
             #self-adversarial sampling weight
             if args.s8:
