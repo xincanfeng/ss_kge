@@ -355,19 +355,22 @@ class KGEModel(nn.Module):
 
         positive_sample, negative_sample, subsampling_weight, mode = next(train_iterator)
 
-        mbs_hr_freq = {}
+        mbs_hr_freq = []
         mbs_counts = KGEModel.count_model_freq(model, positive_sample, args)
-        print(mbs_counts)
         for i in positive_sample:
-            head, relation, tail = i
-            mbs_hr_freq[(head, relation)] = mbs_counts.get((head, relation))
-            # print(mbs_hr_freq)
+            head, relation, tail = i.numpy().tolist()
+            value = mbs_counts.get((head, relation), 0)
+            mbs_hr_freq.append(value)
+        mbs_hr_freq = np.array(mbs_hr_freq).reshape((1024,1))
+        mbs_hr_freq = torch.tensor(mbs_hr_freq)
 
         if args.cuda:
             positive_sample = positive_sample.cuda()
             negative_sample = negative_sample.cuda()
+            mbs_hr_freq = mbs_hr_freq.cuda()
 
         with torch.cuda.amp.autocast():
+
             negative_score = model((positive_sample, negative_sample), mode=mode)
             temp = negative_score.unsqueeze(1)[:,:,0]
             
@@ -390,12 +393,12 @@ class KGEModel(nn.Module):
                 ss_subsampling_weight = (torch.exp(temp * args.self_adversarial_temperature)).detach()
             elif args.s5:
                 ss_subsampling_weight = (torch.exp(-temp * args.self_adversarial_temperature)).detach()
+            elif args.s4:
+                ss_subsampling_weight = (torch.exp(mbs_hr_freq * positive_score * args.self_adversarial_temperature)).detach()
             elif args.s1:
                 ss_subsampling_weight = (positive_score * args.self_adversarial_temperature).detach()
 
             positive_score = F.logsigmoid(positive_score).squeeze(dim = 1)
-
-            batch_size = positive_score.shape[0]
 
             # print('ss_subsampling_weight:')
             # print(ss_subsampling_weight.shape)
@@ -416,7 +419,7 @@ class KGEModel(nn.Module):
             # print('loss:')
             # print(positive_sample_loss)
             # print(negative_sample_loss)
-            exit()
+            # exit()
 
             loss = (positive_sample_loss + negative_sample_loss)/2
             
