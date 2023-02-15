@@ -394,8 +394,6 @@ class KGEModel(nn.Module):
                 ss_subsampling_weight = (torch.exp(temp * args.self_adversarial_temperature)).detach()
             elif args.s5:
                 ss_subsampling_weight = (torch.exp(-temp * args.self_adversarial_temperature)).detach()
-            elif args.s4:
-                ss_subsampling_weight = (torch.exp(mbs_hr_freq * positive_score * args.self_adversarial_temperature)).detach()
             elif args.s3:
                 ss_subsampling_weight = (mbs_hr_freq * positive_score * args.self_adversarial_temperature).detach()
             elif args.s1:

@@ -42,14 +42,14 @@ nohup bash run.sh train ComplEx countries_S1 0 0 512 64 1000 1.0 1.0 0.000002 40
 nohup bash run.sh train ComplEx countries_S2 0 0 512 64 1000 1.0 1.0 0.000002 40000 8 -de -dr -r 0.0005 --countries &
 nohup bash run.sh train ComplEx countries_S3 0 0 512 64 1000 1.0 1.0 0.000002 40000 8 -de -dr -r 0.0005 --countries &
 
-nohup bash run.sh train ComplEx FB15k-237 2 s8 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s8 &
-nohup bash run.sh train ComplEx FB15k-237 2 s7 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s7 &
-nohup bash run.sh train ComplEx FB15k-237 2 s6 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s6 &
-nohup bash run.sh train ComplEx FB15k-237 2 s5 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s5 &
-nohup bash run.sh train ComplEx FB15k-237 3 s4 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s4 &
-nohup bash run.sh train ComplEx FB15k-237 3 s3 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s3 &
-nohup bash run.sh train ComplEx FB15k-237 3 s2 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s2 &
-nohup bash run.sh train ComplEx FB15k-237 3 s1 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s1 &
+nohup bash run.sh train ComplEx FB15k-237 0 s8_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s8 -sa 0.005 &
+nohup bash run.sh train ComplEx FB15k-237 0 s7_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s7 -sa 0.005 &
+nohup bash run.sh train ComplEx FB15k-237 0 s6_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s6 -sa 0.005 &
+nohup bash run.sh train ComplEx FB15k-237 0 s5_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s5 -sa 0.005 &
+nohup bash run.sh train ComplEx FB15k-237 1 s4 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s4 &
+nohup bash run.sh train ComplEx FB15k-237 1 s3_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s3 -sa 0.005 &
+nohup bash run.sh train ComplEx FB15k-237 1 s2 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s2 &
+nohup bash run.sh train ComplEx FB15k-237 1 s1_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s1 -sa 0.005 &
 
 以下还没跑，跑完了再把温度降低一些
 nohup bash run.sh train ComplEx wn18 0 s8 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s8 &
