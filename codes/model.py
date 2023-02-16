@@ -249,7 +249,7 @@ class KGEModel(nn.Module):
         return score
 
     @staticmethod
-    def count_model_freq(model, positive_sample, args):
+    def count_model_freq(model, positive_sample, mode, args):
         '''
         Count model-based frequencies
         '''
@@ -264,16 +264,38 @@ class KGEModel(nn.Module):
             for (head, relation, tail), score in zip(positive_sample, scores): 
                 head, relation, tail, score = [e.item() for e in [head, relation, tail, score]]
                 count[(head, relation, tail)] = score 
-                if (head, relation) in count:
-                    count[(head, relation)] += score 
-                else:
-                    count[(head, relation)] = score 
-                if (tail, -relation-1) in count:
-                    count[(tail, -relation-1)] += score 
-                else: 
-                    count[(tail, -relation-1)] = score
+                if mode == 'head-batch':
+                    if (relation, tail) in count:
+                        count[(relation, tail)] += score
+                    else:
+                        count[(relation, tail)] = score
+                    if (head, -relation-1) in count:
+                        count[(head, -relation-1)] += score
+                    else:
+                        count[(head, -relation-1)] = score
+                elif mode == 'tail-batch':
+                    if (head, relation) in count:
+                        count[(head, relation)] += score 
+                    else:
+                        count[(head, relation)] = score 
+                    if (tail, -relation-1) in count:
+                        count[(tail, -relation-1)] += score 
+                    else: 
+                        count[(tail, -relation-1)] = score
 
-        return count
+            query_freq = []
+            batch_size = positive_sample.shape[0]
+            for i in positive_sample:
+                head, relation, tail = i.cpu().numpy().tolist()
+                if mode == 'head-batch':
+                    value = count.get((relation, tail), 0)
+                elif mode == 'tail-batch':
+                    value = count.get((head, relation), 0)
+                query_freq.append(value)
+            query_freq = np.array(query_freq).reshape((batch_size,1))
+            query_freq = torch.tensor(query_freq)
+                
+        return query_freq
     
     @staticmethod
     def train_step(model, optimizer, scaler, train_iterator, args):
@@ -355,20 +377,12 @@ class KGEModel(nn.Module):
 
         positive_sample, negative_sample, subsampling_weight, mode = next(train_iterator)
 
-        mbs_hr_freq = []
-        mbs_counts = KGEModel.count_model_freq(model, positive_sample, args)
-        batch_size = positive_sample.shape[0]
-        for i in positive_sample:
-            head, relation, tail = i.numpy().tolist()
-            value = mbs_counts.get((head, relation), 0)
-            mbs_hr_freq.append(value)
-        mbs_hr_freq = np.array(mbs_hr_freq).reshape((batch_size,1))
-        mbs_hr_freq = torch.tensor(mbs_hr_freq)
+        query_freq = KGEModel.count_model_freq(model, positive_sample, mode, args)
 
         if args.cuda:
             positive_sample = positive_sample.cuda()
             negative_sample = negative_sample.cuda()
-            mbs_hr_freq = mbs_hr_freq.cuda()
+            query_freq = query_freq.cuda()
 
         with torch.cuda.amp.autocast():
 
@@ -394,8 +408,12 @@ class KGEModel(nn.Module):
                 ss_subsampling_weight = (torch.exp(temp * args.self_adversarial_temperature)).detach()
             elif args.s5:
                 ss_subsampling_weight = (torch.exp(-temp * args.self_adversarial_temperature)).detach()
+            elif args.s4:
+                ss_subsampling_weight = (torch.exp(query_freq * positive_score * args.self_adversarial_temperature)).detach()
             elif args.s3:
-                ss_subsampling_weight = (mbs_hr_freq * positive_score * args.self_adversarial_temperature).detach()
+                ss_subsampling_weight = (query_freq * positive_score * args.self_adversarial_temperature).detach()
+            elif args.s2:
+                ss_subsampling_weight = (torch.exp(query_freq * positive_score * args.self_adversarial_temperature)).detach()
             elif args.s1:
                 ss_subsampling_weight = (positive_score * args.self_adversarial_temperature).detach()
 
@@ -414,9 +432,12 @@ class KGEModel(nn.Module):
                 positive_sample_loss = - positive_score.mean()
                 negative_sample_loss = - negative_score.mean()
             else:
-                positive_sample_loss = - (ss_subsampling_weight * positive_score).sum()/ss_subsampling_weight.sum() 
                 negative_sample_loss = - (ss_subsampling_weight * negative_score).sum()/ss_subsampling_weight.sum() 
-
+                if args.s2:
+                    positive_sample_loss = - positive_score.mean() 
+                else:
+                    positive_sample_loss = - (ss_subsampling_weight * positive_score).sum()/ss_subsampling_weight.sum() 
+    
             # print('loss:')
             # print(positive_sample_loss)
             # print(negative_sample_loss)
