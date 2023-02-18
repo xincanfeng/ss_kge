@@ -408,12 +408,8 @@ class KGEModel(nn.Module):
                 ss_subsampling_weight = (torch.exp(temp * args.self_adversarial_temperature)).detach()
             elif args.s5:
                 ss_subsampling_weight = (torch.exp(-temp * args.self_adversarial_temperature)).detach()
-            elif args.s4:
-                ss_subsampling_weight = (torch.exp(query_freq * positive_score * args.self_adversarial_temperature)).detach()
             elif args.s3:
                 ss_subsampling_weight = (query_freq * positive_score * args.self_adversarial_temperature).detach()
-            elif args.s2:
-                ss_subsampling_weight = (torch.exp(query_freq * positive_score * args.self_adversarial_temperature)).detach()
             elif args.s1:
                 ss_subsampling_weight = (positive_score * args.self_adversarial_temperature).detach()
 
@@ -433,7 +429,7 @@ class KGEModel(nn.Module):
                 negative_sample_loss = - negative_score.mean()
             else:
                 negative_sample_loss = - (ss_subsampling_weight * negative_score).sum()/ss_subsampling_weight.sum() 
-                if args.s2:
+                if args.s8 or args.s7 or args.s6 or args.s5 or args.s3 or args.s1:
                     positive_sample_loss = - positive_score.mean() 
                 else:
                     positive_sample_loss = - (ss_subsampling_weight * positive_score).sum()/ss_subsampling_weight.sum() 
