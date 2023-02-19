@@ -388,6 +388,7 @@ class KGEModel(nn.Module):
 
             negative_score = model((positive_sample, negative_sample), mode=mode)
             temp = negative_score.unsqueeze(1)[:,:,0]
+            print(negative_score.shape)
             
             if args.negative_adversarial_sampling:
                 #In self-adversarial sampling, we do not apply back-propagation on the sampling weight
@@ -397,7 +398,8 @@ class KGEModel(nn.Module):
                 negative_score = F.logsigmoid(-negative_score).mean(dim = 1)
 
             positive_score = model(positive_sample)
-            # print(positive_score.shape)
+            print(positive_score.shape)
+            exit()
 
             #self-adversarial sampling weight
             if args.s8:
@@ -409,7 +411,7 @@ class KGEModel(nn.Module):
             elif args.s5:
                 ss_subsampling_weight = (torch.exp(-temp * args.self_adversarial_temperature)).detach()
             elif args.s3:
-                ss_subsampling_weight = (query_freq * positive_score * args.self_adversarial_temperature).detach()
+                ss_subsampling_weight = (query_freq * args.self_adversarial_temperature).detach()
             elif args.s1:
                 ss_subsampling_weight = (positive_score * args.self_adversarial_temperature).detach()
 
