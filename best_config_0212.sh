@@ -16,7 +16,9 @@ nohup bash run.sh train RotatE wn18 2 s8_0.005 512 1024 500 12.0 0.5 0.0001 8000
 nohup bash run.sh train RotatE wn18 2 s7_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s7 -sa 0.005 &
 nohup bash run.sh train RotatE wn18 2 s6_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s6 -sa 0.005 &
 nohup bash run.sh train RotatE wn18 2 s5_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s5 -sa 0.005 &
+nohup bash run.sh train RotatE wn18 3 s4_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s4 -sa 0.005 &
 nohup bash run.sh train RotatE wn18 3 s3_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s3 -sa 0.005 &
+nohup bash run.sh train RotatE wn18 3 s2_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s2 -sa 0.005 &
 nohup bash run.sh train RotatE wn18 3 s1_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s1 -sa 0.005 &
 #
 # Best Configuration for pRotatE
@@ -51,8 +53,8 @@ nohup bash run.sh train ComplEx countries_S3 0 0 512 64 1000 1.0 1.0 0.000002 40
 
 nohup bash run.sh train ComplEx FB15k-237 2 s8_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s8 -sa 0.005 &
 nohup bash run.sh train ComplEx FB15k-237 2 s7_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s7 -sa 0.005 &
-nohup bash run.sh train ComplEx FB15k-237 1 s6_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s6 -sa 0.005 &
-nohup bash run.sh train ComplEx FB15k-237 1 s5_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s5 -sa 0.005 &
+nohup bash run.sh train ComplEx FB15k-237 2 s6_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s6 -sa 0.005 &
+nohup bash run.sh train ComplEx FB15k-237 2 s5_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s5 -sa 0.005 &
 nohup bash run.sh train ComplEx FB15k-237 1 s4_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s4 -sa 0.005 &
 nohup bash run.sh train ComplEx FB15k-237 1 s3_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s3 -sa 0.005 &
 nohup bash run.sh train ComplEx FB15k-237 1 s2_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s2 -sa 0.005 &
