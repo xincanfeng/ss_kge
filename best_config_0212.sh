@@ -60,17 +60,7 @@ nohup bash run.sh train ComplEx FB15k-237 1 s3_0.005 1024 256 1000 200.0 1.0 0.0
 nohup bash run.sh train ComplEx FB15k-237 1 s2_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s2 -sa 0.005 &
 nohup bash run.sh train ComplEx FB15k-237 1 s1_0.005 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s1 -sa 0.005 &
 
-以下还没跑，跑完了再把温度降低一些
-nohup bash run.sh train ComplEx wn18 0 s8 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s8 &
-nohup bash run.sh train ComplEx wn18 0 s7 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s7 &
-nohup bash run.sh train ComplEx wn18 0 s6 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s6 &
-nohup bash run.sh train ComplEx wn18 0 s5 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s5 &
-nohup bash run.sh train ComplEx wn18 0 s4 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s4 &
-nohup bash run.sh train ComplEx wn18 0 s3 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s3 &
-nohup bash run.sh train ComplEx wn18 0 s2 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s2 &
-nohup bash run.sh train ComplEx wn18 0 s1 512 1024 500 200.0 1.0 0.001 80000 8 -de -dr -r 0.00001 --s1 &
-
-比如温度
+跑完再降低一些温度，比如
 nohup bash run.sh train ComplEx FB15k-237 2 s8 1024 256 1000 200.0 1.0 0.001 100000 16 -de -dr -r 0.00001 --s8 -sa 0.001 &
 #
 # Best Configuration for DistMult
