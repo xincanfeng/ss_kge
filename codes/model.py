@@ -386,41 +386,16 @@ class KGEModel(nn.Module):
 
         with torch.cuda.amp.autocast():
 
-            negative_score = model((positive_sample, negative_sample), mode=mode)
-            negative_score_first = negative_score.unsqueeze(1)[:,:,0] # only use the first negative sample, negative_adversarial_sampling?
-
-            positive_score = model(positive_sample)
-
             #self-adversarial sampling weight
             #In self-adversarial sampling, we do not apply back-propagation on the sampling weight 
-            if args.s8:
-                ss_subsampling_weight = (torch.exp(positive_score * args.self_adversarial_temperature)).detach()
-            elif args.s7:
-                ss_subsampling_weight = (positive_score * args.self_adversarial_temperature).detach()
-            elif args.s6:
-                ss_subsampling_weight = (torch.exp(negative_score_first * args.self_adversarial_temperature)).detach()
-            elif args.s5:
-                ss_subsampling_weight = (torch.pow(query_freq, args.self_adversarial_temperature)).detach()
-            elif args.s4:
-                ss_subsampling_weight = (query_freq * args.self_adversarial_temperature).detach()
-            elif args.s3:
-                ss_subsampling_weight = (negative_score_first * query_freq * args.self_adversarial_temperature).detach()
-            elif args.s2:
-                ss_subsampling_weight = (torch.pow(negative_score_first * query_freq, args.self_adversarial_temperature)).detach()
-            # elif args.s1:
+            ss_subsampling_weight = (torch.pow(query_freq, args.self_adversarial_temperature)).detach()
 
+            negative_score = model((positive_sample, negative_sample), mode=mode)
             negative_score = F.logsigmoid(-negative_score).mean(dim = 1) 
+
+            positive_score = model(positive_sample)
             positive_score = F.logsigmoid(positive_score).squeeze(dim = 1) 
 
-            # print('ss_subsampling_weight:')
-            # print(ss_subsampling_weight.shape)
-            # print('score:')
-            # print(positive_score)
-            # print(negative_score)
-            # print('weighted score:')
-            # print((ss_subsampling_weight * positive_score).shape)
-            # print(ss_subsampling_weight * negative_score)
-            
             if args.uni_weight:
                 positive_sample_loss = - positive_score.mean()
                 negative_sample_loss = - negative_score.mean()
