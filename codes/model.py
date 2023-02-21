@@ -331,9 +331,7 @@ class KGEModel(nn.Module):
             positive_sample_loss = - positive_score.mean()
             negative_sample_loss = - negative_score.mean()
         else:
-            #applying term A
             positive_sample_loss = - (subsampling_weight * positive_score).sum()/subsampling_weight.sum()
-            #applying term B
             negative_sample_loss = - (subsampling_weight * negative_score).sum()/subsampling_weight.sum()
 
         loss = (positive_sample_loss + negative_sample_loss)/2
@@ -390,10 +388,10 @@ class KGEModel(nn.Module):
             #In self-adversarial sampling, we do not apply back-propagation on the sampling weight 
             ss_subsampling_weight = (torch.pow(query_freq, args.self_adversarial_temperature)).detach()
 
-            negative_score = model((positive_sample, negative_sample), mode=mode)
+            negative_score = model((positive_sample, negative_sample), mode=mode) 
             negative_score = F.logsigmoid(-negative_score).mean(dim = 1) 
 
-            positive_score = model(positive_sample)
+            positive_score = model(positive_sample) 
             positive_score = F.logsigmoid(positive_score).squeeze(dim = 1) 
 
             if args.uni_weight:
