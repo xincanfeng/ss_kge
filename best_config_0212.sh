@@ -12,14 +12,22 @@ nohup bash run.sh train RotatE countries_S2 0 0 512 64 1000 0.1 1.0 0.000002 400
 nohup bash run.sh train RotatE countries_S3 0 0 512 64 1000 0.1 1.0 0.000002 40000 8 -de --countries &
 nohup bash run.sh train RotatE YAGO3-10 0 0 1024 400 500 24.0 1.0 0.0002 100000 4 -de &
 
-nohup bash run.sh train RotatE wn18 2 s8_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s8 -sa 0.005 &
-nohup bash run.sh train RotatE wn18 2 s7_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s7 -sa 0.005 &
-nohup bash run.sh train RotatE wn18 2 s6_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s6 -sa 0.005 &
-nohup bash run.sh train RotatE wn18 2 s5_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s5 -sa 0.005 &
-nohup bash run.sh train RotatE wn18 3 s4_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s4 -sa 0.005 &
-nohup bash run.sh train RotatE wn18 3 s3_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s3 -sa 0.005 &
-nohup bash run.sh train RotatE wn18 3 s2_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s2 -sa 0.005 &
-nohup bash run.sh train RotatE wn18 3 s1_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s1 -sa 0.005 &
+nohup bash run.sh train RotatE wn18 2 s_1000 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s8 -sa -1000 &
+nohup bash run.sh train RotatE wn18 2 s_100 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s7 -sa -100 &
+nohup bash run.sh train RotatE wn18 2 s_10 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s6 -sa -10 &
+nohup bash run.sh train RotatE wn18 2 s_7 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s5 -sa -7 &
+nohup bash run.sh train RotatE wn18 3 s_5 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s4 -sa -5 &
+nohup bash run.sh train RotatE wn18 3 s_3 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s3 -sa -3 &
+nohup bash run.sh train RotatE wn18 3 s_2 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s2 -sa -2 &
+nohup bash run.sh train RotatE wn18 3 s_1 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s1 -sa -1 &
+nohup bash run.sh train RotatE wn18 0 s_0.5 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s1 -sa -0.5 &
+nohup bash run.sh train RotatE wn18 0 s_0.1 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s1 -sa -0.1 &
+nohup bash run.sh train RotatE wn18 0 s_0.05 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s1 -sa -0.05 &
+nohup bash run.sh train RotatE wn18 0 s_0.01 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s1 -sa -0.01 &
+nohup bash run.sh train RotatE wn18 1 s_0.005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s1 -sa -0.005 &
+nohup bash run.sh train RotatE wn18 1 s_0.001 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s1 -sa -0.001 &
+nohup bash run.sh train RotatE wn18 1 s_0.0005 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s1 -sa -0.0005 &
+nohup bash run.sh train RotatE wn18 1 s_0.0001 512 1024 500 12.0 0.5 0.0001 80000 8 -de --s1 -sa -0.0001 &
 #
 # Best Configuration for pRotatE
 #
