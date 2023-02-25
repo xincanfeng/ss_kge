@@ -380,6 +380,7 @@ class KGEModel(nn.Module):
         if args.cuda:
             positive_sample = positive_sample.cuda()
             negative_sample = negative_sample.cuda()
+            subsampling_weight = subsampling_weight.cuda()
             query_freq = query_freq.cuda()
 
         with torch.cuda.amp.autocast():
@@ -398,7 +399,7 @@ class KGEModel(nn.Module):
                 positive_sample_loss = - positive_score.mean()
                 negative_sample_loss = - negative_score.mean()
             else:
-                positive_sample_loss = - positive_score.mean() 
+                positive_sample_loss = - (subsampling_weight * positive_score).sum()/subsampling_weight.sum()
                 negative_sample_loss = - (ss_subsampling_weight * negative_score).sum()/ss_subsampling_weight.sum()
     
             # print('loss:')
