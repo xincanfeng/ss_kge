@@ -400,8 +400,7 @@ class KGEModel(nn.Module):
                 negative_sample_loss = - negative_score.mean()
             else:
                 positive_sample_loss = - (subsampling_weight * positive_score).sum()/subsampling_weight.sum()
-                # negative_sample_loss = - (ss_subsampling_weight * negative_score).sum()/ss_subsampling_weight.sum()
-                negative_sample_loss = - (subsampling_weight * ss_subsampling_weight * negative_score).sum()/subsampling_weight.sum()
+                negative_sample_loss = - (subsampling_weight * ss_subsampling_weight * negative_score).sum()/(subsampling_weight * ss_subsampling_weight).sum()
     
             # print('loss:')
             # print(positive_sample_loss)
