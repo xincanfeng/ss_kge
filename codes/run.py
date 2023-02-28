@@ -69,7 +69,7 @@ def parse_args(args=None):
     parser.add_argument('--nentity', type=int, default=0, help='DO NOT MANUALLY SET')
     parser.add_argument('--nrelation', type=int, default=0, help='DO NOT MANUALLY SET')
 
-    # parser.add_argument('--ss', action='store_true', help='Self-adversarial subsampling')
+    parser.add_argument('-ss', '--self_adversarial_subsampling', action='store_true', help='Self-adversarial subsampling')
     parser.add_argument('--s1', action='store_true', help='Self-adversarial subsampling')
     parser.add_argument('--s2', action='store_true', help='Self-adversarial subsampling')
     parser.add_argument('--s3', action='store_true', help='Self-adversarial subsampling')
@@ -288,7 +288,7 @@ def main(args):
             warm_up_steps = checkpoint['warm_up_steps']
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     else:
-        logging.info('Ramdomly Initializing %s Model...' % args.model)
+        logging.info('Randomly Initializing %s Model...' % args.model)
         init_step = 0
     
     step = init_step
@@ -301,7 +301,10 @@ def main(args):
     logging.info('gamma = %f' % args.gamma)
     logging.info('negative_adversarial_sampling = %s' % str(args.negative_adversarial_sampling))
     if args.negative_adversarial_sampling:
-        logging.info('adversarial_temperature = %f' % args.adversarial_temperature)
+        logging.info('adversarial_temperature = %f' % args.adversarial_temperature) 
+    logging.info('self_adversarial_subsampling = %d' % args.self_adversarial_subsampling)
+    if args.self_adversarial_subsampling:
+        logging.info('self_adversarial_temperature = %f' % self_adversarial_temperature)
     
     # Set valid dataloader as it would be evaluated during training
     
