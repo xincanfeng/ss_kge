@@ -302,9 +302,9 @@ def main(args):
     logging.info('negative_adversarial_sampling = %s' % str(args.negative_adversarial_sampling))
     if args.negative_adversarial_sampling:
         logging.info('adversarial_temperature = %f' % args.adversarial_temperature) 
-    logging.info('self_adversarial_subsampling = %d' % args.self_adversarial_subsampling)
+    logging.info('self_adversarial_subsampling = %s' % str(args.self_adversarial_subsampling))
     if args.self_adversarial_subsampling:
-        logging.info('self_adversarial_temperature = %f' % self_adversarial_temperature)
+        logging.info('self_adversarial_temperature = %f' % args.self_adversarial_temperature)
     
     # Set valid dataloader as it would be evaluated during training
     
