@@ -389,14 +389,12 @@ class KGEModel(nn.Module):
 
         negative_score = model((positive_sample, negative_sample), mode=mode) 
 
-        # if args.negative_adversarial_sampling:
-        #     #In self-adversarial sampling, we do not apply back-propagation on the sampling weight
-        #     negative_score = (F.softmax(negative_score * args.adversarial_temperature, dim = 1).detach() 
-        #                       * F.logsigmoid(-negative_score)).sum(dim = 1)
-        # else:
-        #     negative_score = F.logsigmoid(-negative_score).mean(dim = 1)
-
-        negative_score = F.logsigmoid(-negative_score).mean(dim = 1)
+        if args.negative_adversarial_sampling:
+            #In self-adversarial sampling, we do not apply back-propagation on the sampling weight
+            negative_score = (F.softmax(negative_score * args.adversarial_temperature, dim = 1).detach() 
+                              * F.logsigmoid(-negative_score)).sum(dim = 1)
+        else:
+            negative_score = F.logsigmoid(-negative_score).mean(dim = 1)
 
         positive_score = model(positive_sample) 
         
@@ -409,14 +407,18 @@ class KGEModel(nn.Module):
             positive_sample_loss = - (subsampling_weight * positive_score).sum()/subsampling_weight.sum()
             negative_sample_loss = - (subsampling_weight * negative_score).sum()/subsampling_weight.sum()
         elif args.s2:   
-            positive_sample_loss = - (ss_subsampling_weight * positive_score).sum()/ss_subsampling_weight.sum()
-            negative_sample_loss = - (ss_subsampling_weight * negative_score).sum()/ss_subsampling_weight.sum()     
+            positive_sample_loss = - (subsampling_weight * positive_score).sum()/subsampling_weight.sum()
+            positive_sample_loss = - (ss_subsampling_weight * positive_sample_loss).sum()/ss_subsampling_weight.sum()
+            negative_sample_loss = - (subsampling_weight * negative_score).sum()/subsampling_weight.sum()
+            negative_sample_loss = - (ss_subsampling_weight * negative_sample_loss).sum()/ss_subsampling_weight.sum()     
         elif args.s3:
             positive_sample_loss = - ((subsampling_weight * ss_subsampling_weight) * positive_score).sum()/(subsampling_weight * ss_subsampling_weight).sum()
             negative_sample_loss = - ((subsampling_weight * ss_subsampling_weight) * negative_score).sum()/(subsampling_weight * ss_subsampling_weight).sum()    
         elif args.s4: 
-            positive_sample_loss = - (ss_subsampling_weight2 * positive_score).sum()/ss_subsampling_weight2.sum()
-            negative_sample_loss = - (ss_subsampling_weight2 * negative_score).sum()/ss_subsampling_weight2.sum()           
+            positive_sample_loss = - (subsampling_weight * positive_score).sum()/subsampling_weight.sum()
+            positive_sample_loss = - (ss_subsampling_weight2 * positive_sample_loss).sum()/ss_subsampling_weight2.sum()
+            negative_sample_loss = - (subsampling_weight * negative_score).sum()/subsampling_weight.sum()
+            negative_sample_loss = - (ss_subsampling_weight2 * negative_sample_loss).sum()/ss_subsampling_weight2.sum()             
         elif args.s5:
             positive_sample_loss = - ((subsampling_weight * ss_subsampling_weight2) * positive_score).sum()/(subsampling_weight * ss_subsampling_weight2).sum()
             negative_sample_loss = - ((subsampling_weight * ss_subsampling_weight2) * negative_score).sum()/(subsampling_weight * ss_subsampling_weight2).sum()               
