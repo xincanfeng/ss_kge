@@ -406,15 +406,9 @@ class KGEModel(nn.Module):
         elif args.s1:
             positive_sample_loss = - (subsampling_weight * positive_score).sum()/subsampling_weight.sum()
             negative_sample_loss = - (subsampling_weight * negative_score).sum()/subsampling_weight.sum()
-        elif args.s2:   
-            positive_sample_loss = - ((subsampling_weight + ss_subsampling_weight) * positive_score).sum()/(subsampling_weight + ss_subsampling_weight).sum()
-            negative_sample_loss = - ((subsampling_weight + ss_subsampling_weight) * negative_score).sum()/(subsampling_weight + ss_subsampling_weight).sum()  
         elif args.s3:
             positive_sample_loss = - ((subsampling_weight * ss_subsampling_weight) * positive_score).sum()/(subsampling_weight * ss_subsampling_weight).sum()
             negative_sample_loss = - ((subsampling_weight * ss_subsampling_weight) * negative_score).sum()/(subsampling_weight * ss_subsampling_weight).sum()    
-        elif args.s4: 
-            positive_sample_loss = - ((subsampling_weight + ss_subsampling_weight2) * positive_score).sum()/(subsampling_weight + ss_subsampling_weight2).sum()
-            negative_sample_loss = - ((subsampling_weight + ss_subsampling_weight2) * negative_score).sum()/(subsampling_weight + ss_subsampling_weight2).sum()
         elif args.s5:
             positive_sample_loss = - ((subsampling_weight * ss_subsampling_weight2) * positive_score).sum()/(subsampling_weight * ss_subsampling_weight2).sum()
             negative_sample_loss = - ((subsampling_weight * ss_subsampling_weight2) * negative_score).sum()/(subsampling_weight * ss_subsampling_weight2).sum()               
